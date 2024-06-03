@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectNumberOfQuestions, startQuiz, submitQuiz, answerQuestion } from '../Redux/actions';
+import { selectNumberOfQuestions, startQuiz, submitQuiz, answerQuestion, changeQuestion } from '../Redux/actions';
 import quizQuestions from './QuizQuestions';
 import MyTimer from './Timer';
 
@@ -35,18 +35,6 @@ const Quiz = () => {
   };
 
   const handleSubmitQuiz = () => {
-    // Calculate score or perform any necessary actions
-    const results = quizQuestions.map((question, index) => {
-      const userAnswer = answers[index];
-      if (question.type === 'multiple') {
-        return (
-          JSON.stringify([...userAnswer].sort()) === JSON.stringify([...question.correctAnswer].sort())
-        );
-      } else {
-        return userAnswer === question.correctAnswer;
-      }
-    });
-    console.log("Quiz Results: ", results);
     dispatch(submitQuiz());
   };
 
@@ -56,6 +44,18 @@ const Quiz = () => {
       ? [...currentAnswers, option]
       : currentAnswers.filter(ans => ans !== option);
     handleAnswerQuestion(questionIndex, newAnswers);
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      dispatch(changeQuestion(currentQuestionIndex - 1));
+    }
+  };
+
+  const handleSkipQuestion = () => {
+    if (currentQuestionIndex < numberOfQuestions - 1) {
+      dispatch(changeQuestion(currentQuestionIndex + 1));
+    }
   };
 
   return (
@@ -113,15 +113,23 @@ const Quiz = () => {
               </div>
             )}
           </div>
-          <button
-            onClick={() =>
-              currentQuestionIndex < numberOfQuestions - 1
-                ? dispatch(answerQuestion({ questionIndex: currentQuestionIndex + 1, answer: answers[currentQuestionIndex] }))
-                : handleSubmitQuiz()
-            }
-          >
-            {currentQuestionIndex < numberOfQuestions - 1 ? 'Next' : 'Submit'}
-          </button>
+          <div>
+            <button onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0}>
+              Previous
+            </button>
+            <button
+              onClick={() =>
+                currentQuestionIndex < numberOfQuestions - 1
+                  ? dispatch(answerQuestion({ questionIndex: currentQuestionIndex + 1, answer: answers[currentQuestionIndex] }))
+                  : handleSubmitQuiz()
+              }
+            >
+              {currentQuestionIndex < numberOfQuestions - 1 ? 'Next' : 'Submit'}
+            </button>
+            <button onClick={handleSkipQuestion} disabled={currentQuestionIndex >= numberOfQuestions - 1}>
+              Skip
+            </button>
+          </div>
         </div>
       )}
     </div>

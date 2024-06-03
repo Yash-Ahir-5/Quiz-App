@@ -4,3 +4,4 @@ export const selectNumberOfQuestions = createAction('quiz/selectNumberOfQuestion
 export const startQuiz = createAction('quiz/startQuiz');
 export const answerQuestion = createAction('quiz/answerQuestion');
 export const submitQuiz = createAction('quiz/submitQuiz');
+export const changeQuestion = createAction('quiz/changeQuestion');
